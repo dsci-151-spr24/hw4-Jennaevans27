@@ -1,11 +1,12 @@
 ---
 title: "HW 04 - Modeling the GSS"
+author: Jenna Evans 
 output: html_document
 ---
 
 ```{r include = FALSE}
 knitr::opts_chunk$set(
-  eval = FALSE,
+  eval = TRUE,
   out.width = "80%",
   fig.asp = 0.618,
   fig.width = 10,
@@ -41,9 +42,15 @@ You can load them by running the following in your Console:
 ```{r load-packages, message = FALSE, eval = TRUE}
 library(tidyverse)
 library(tidymodels)
+library(ggplot2)
 library(dsbox)
 ```
 
+```{r}
+ install.packages("devtools")
+ devtools::install_github("tidyverse/dsbox")
+```
+ 
 ## Data
 
 The data can be found in the **dsbox** package, and it's called `gss16`.
