@@ -189,6 +189,8 @@ gss16_fit_rs_1 <- gss16_wflow_1 %>%
 collect_metrics(gss16_fit_rs_1, summarize = FALSE)
 collect_metrics(gss16_fit_rs_1)
 ```
+***The mean area under the ROC curve is 0.62, while the overall accuracy across all cross-validation folds is 0.84.*** 
+
 
 9.  Now, try a different, simpler model: predict `advfront` from only `polviews` and `educ`.
     Specifically,
@@ -230,9 +232,11 @@ set.seed(789)
 
 
 ```
-
+***The mean area under the ROC curve is 0.61, while the overall accuracy across all cross-validation folds is 0.83.*** 
 
 10. Comment on which model performs better (one including `wrkstat`, model 1, or the one excluding `wrkstat`, model 2) on the training data based on area under the ROC curve.
+
+***Model 1 performed slightly better*** 
 
 11. Fit both models to the testing data, plot the ROC curves for the predictions for both models, and calculate the areas under the ROC curve.
     Does your answer to the previous exercise hold for the testing data as well?
@@ -274,7 +278,7 @@ ggplot(roc_combined, aes(x = 1 - specificity, y = sensitivity, color = model)) +
   labs(title = "ROC Curves for Both Models", x = "1 - Specificity", y = "Sensitivity")
 ```
 
-
+***The AUC showed that model 2 worked better, which is the opposite that was shown in the training data.***
 
 
 
@@ -292,8 +296,49 @@ The question is phrased as the following.
 Answers to this question are stored in the `harass5` variable in our dataset.
 
 12. Create a subset of the data that only contains `Yes` and `No` answers for the harassment question. How many responses chose each of these answers?
+
+```{r} 
+gss16_harass <- gss16 %>%
+   filter(harass5 %in% c("Yes", "No")) %>%
+   count(harass5)
+ 
+ gss16_harass
+```
+
+***1,126 sad no and 237 said yes.***
+
+
+
 13. Describe how bootstrapping can be used to estimate the proportion of Americans who have been harassed by their superiors or co-workers at their job.
+
+***Bootstrapping can be used to estimate the proportion of Americans who have been harassed by their bosses or co-workers by resampling from the existing survey data to create many simulated samples.*** 
+
 14. Calculate a 95% bootstrap confidence interval for the proportion of Americans who have been harassed by their superiors or co-workers at their job. Interpret this interval in context of the data.
+
+***Based on the bootstrap analysis, we can say with 95% confidence that the true proportion of Americans who have experienced harassment by a superior or co-worker at work falls between 15.4% and 19.3%.*** 
+
+```{r}
+set.seed(987)
+ gss16_harass_filtered <- gss16 %>%
+   filter(harass5 %in% c("Yes", "No"))
+  bootstrap_proportion <- function(data, n) {
+   sample_data <- sample(data, size = n, replace = TRUE)
+   mean(sample_data == "Yes") 
+ }
+ 
+ n_bootstrap <- 1000
+ 
+ bootstrap_results <- replicate(n_bootstrap, 
+                                bootstrap_proportion(gss16_harass_filtered$harass5, 
+                                                     length(gss16_harass_filtered$harass5)))
+ 
+ conf_int <- quantile(bootstrap_results, probs = c(0.025, 0.975))
+ conf_int
+```
+
 15. Would you expect a 90% confidence interval to be wider or narrower than the interval you calculated above? Explain your reasoning.
+
+***A 90% confidence interval would be narrower than the 95% confidence interval because lowering the confidence level means you're allowing for a greater chance that the interval will not contain the true population proportion. So, to compensate, the interval doesn’t need to stretch as far in either direction, it becomes more precise, but less confident.*** 
+
 
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards and review the md document on GitHub to make sure you're happy with the final state of your work.*
